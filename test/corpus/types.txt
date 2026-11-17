@@ -1,0 +1,165 @@
+================================================================================
+Struct definition
+================================================================================
+
+enclave {
+    struct point {
+        int x;
+        int y;
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (struct_definition
+      (type_identifier)
+      (field_declaration_list
+        (field_declaration
+          (primitive_type)
+          (field_identifier))
+        (field_declaration
+          (primitive_type)
+          (field_identifier))))))
+
+================================================================================
+Struct with deep copy attributes
+================================================================================
+
+enclave {
+    struct buffer {
+        size_t len;
+        [size=len] uint8_t* data;
+        [count=4] int* four;
+        char name[16];
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (struct_definition
+      (type_identifier)
+      (field_declaration_list
+        (field_declaration
+          (primitive_type)
+          (field_identifier))
+        (field_declaration
+          (attribute_list
+            (attribute
+              (identifier)
+              (identifier)))
+          (primitive_type)
+          (pointer)
+          (field_identifier))
+        (field_declaration
+          (attribute_list
+            (attribute
+              (identifier)
+              (number_literal)))
+          (primitive_type)
+          (pointer)
+          (field_identifier))
+        (field_declaration
+          (primitive_type)
+          (field_identifier)
+          (array_dimension
+            (number_literal)))))))
+
+================================================================================
+Struct without semicolon after last member (Open Enclave)
+================================================================================
+
+enclave {
+    struct s {
+        int a;
+        int b
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (struct_definition
+      (type_identifier)
+      (field_declaration_list
+        (field_declaration
+          (primitive_type)
+          (field_identifier))
+        (field_declaration
+          (primitive_type)
+          (field_identifier))))))
+
+================================================================================
+Union definition
+================================================================================
+
+enclave {
+    union value {
+        int i;
+        double d;
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (union_definition
+      (type_identifier)
+      (field_declaration_list
+        (field_declaration
+          (primitive_type)
+          (field_identifier))
+        (field_declaration
+          (primitive_type)
+          (field_identifier))))))
+
+================================================================================
+Enum definitions
+================================================================================
+
+enclave {
+    enum color {
+        RED,
+        GREEN = 5,
+        BLUE = 0x10,
+        ALIAS = GREEN
+    };
+    enum {
+        ANON_A,
+        ANON_B,
+    };
+    enum empty {};
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (enum_definition
+      (type_identifier)
+      (enumerator_list
+        (enumerator
+          (identifier))
+        (enumerator
+          (identifier)
+          (number_literal))
+        (enumerator
+          (identifier)
+          (number_literal))
+        (enumerator
+          (identifier)
+          (identifier))))
+    (enum_definition
+      (enumerator_list
+        (enumerator
+          (identifier))
+        (enumerator
+          (identifier))))
+    (enum_definition
+      (type_identifier)
+      (enumerator_list))))

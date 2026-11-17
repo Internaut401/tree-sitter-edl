@@ -1,0 +1,186 @@
+================================================================================
+Pointer attributes
+================================================================================
+
+enclave {
+    trusted {
+        public void f([in, size=len] const uint8_t* buf, size_t len,
+                      [out, count=4] int* out4,
+                      [in, out] char* both,
+                      [user_check] void* raw,
+                      [in, wstring] const wchar_t* ws,
+                      [isptr, in, size=sz, readonly] foo_t p);
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (trusted_block
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier))
+              (attribute
+                (identifier)
+                (identifier)))
+            (type_qualifier)
+            (primitive_type)
+            (pointer)
+            (identifier))
+          (parameter
+            (primitive_type)
+            (identifier))
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier))
+              (attribute
+                (identifier)
+                (number_literal)))
+            (primitive_type)
+            (pointer)
+            (identifier))
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier))
+              (attribute
+                (identifier)))
+            (primitive_type)
+            (pointer)
+            (identifier))
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier)))
+            (primitive_type)
+            (pointer)
+            (identifier))
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier))
+              (attribute
+                (identifier)))
+            (type_qualifier)
+            (primitive_type)
+            (pointer)
+            (identifier))
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier))
+              (attribute
+                (identifier))
+              (attribute
+                (identifier)
+                (identifier))
+              (attribute
+                (identifier)))
+            (type_identifier)
+            (identifier)))))))
+
+================================================================================
+Arrays and multiple pointers
+================================================================================
+
+enclave {
+    trusted {
+        public void f([in] int arr[4][5], [in] char name[MAX_NAME], [] int empty[], char** pp);
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (trusted_block
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier)))
+            (primitive_type)
+            (identifier)
+            (array_dimension
+              (number_literal))
+            (array_dimension
+              (number_literal)))
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier)))
+            (primitive_type)
+            (identifier)
+            (array_dimension
+              (identifier)))
+          (parameter
+            (attribute_list)
+            (primitive_type)
+            (identifier)
+            (array_dimension))
+          (parameter
+            (primitive_type)
+            (pointer)
+            (pointer)
+            (identifier)))))))
+
+================================================================================
+Sized, composite and user types
+================================================================================
+
+enclave {
+    trusted {
+        public unsigned long long f(unsigned u, long double ld, short int si,
+                                    struct point pt, union value v, enum color c,
+                                    bool b, my_handle_t h);
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (trusted_block
+      (function_declaration
+        (sized_type_specifier)
+        (identifier)
+        (parameter_list
+          (parameter
+            (sized_type_specifier)
+            (identifier))
+          (parameter
+            (sized_type_specifier
+              (primitive_type))
+            (identifier))
+          (parameter
+            (sized_type_specifier
+              (primitive_type))
+            (identifier))
+          (parameter
+            (struct_specifier
+              (type_identifier))
+            (identifier))
+          (parameter
+            (union_specifier
+              (type_identifier))
+            (identifier))
+          (parameter
+            (enum_specifier
+              (type_identifier))
+            (identifier))
+          (parameter
+            (primitive_type)
+            (identifier))
+          (parameter
+            (type_identifier)
+            (identifier)))))))

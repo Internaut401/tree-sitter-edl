@@ -1,0 +1,109 @@
+================================================================================
+Trusted functions
+================================================================================
+
+enclave {
+    trusted {
+        include "trusted_header.h"
+        public void ecall_public(void);
+        int ecall_private();
+        public sgx_status_t ecall_switchless(int x) transition_using_threads;
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (trusted_block
+      (include_declaration
+        (string_literal))
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list
+          (parameter
+            (primitive_type))))
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list))
+      (function_declaration
+        (type_identifier)
+        (identifier)
+        (parameter_list
+          (parameter
+            (primitive_type)
+            (identifier)))
+        (function_modifier)))))
+
+================================================================================
+Untrusted functions
+================================================================================
+
+enclave {
+    untrusted {
+        void ocall_print([in, string] const char* str);
+        [cdecl, dllimport] int ocall_win(void);
+        void ocall_allow() allow(ecall_a, ecall_b);
+        void ocall_allow_none() allow();
+        int ocall_errno() propagate_errno;
+        int ocall_both() allow(ecall_a) transition_using_threads propagate_errno;
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (untrusted_block
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier))
+              (attribute
+                (identifier)))
+            (type_qualifier)
+            (primitive_type)
+            (pointer)
+            (identifier))))
+      (function_declaration
+        (attribute_list
+          (attribute
+            (identifier))
+          (attribute
+            (identifier)))
+        (primitive_type)
+        (identifier)
+        (parameter_list
+          (parameter
+            (primitive_type))))
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list)
+        (allow_list
+          (identifier)
+          (identifier)))
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list)
+        (allow_list))
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list)
+        (function_modifier))
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list)
+        (allow_list
+          (identifier))
+        (function_modifier)
+        (function_modifier)))))

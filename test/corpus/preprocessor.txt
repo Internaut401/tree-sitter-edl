@@ -1,0 +1,117 @@
+================================================================================
+Conditional blocks between declarations
+================================================================================
+
+enclave {
+#ifdef FEATURE
+    include "feature.h"
+#else
+    include "no_feature.h"
+#endif
+    trusted {
+#ifndef NDEBUG
+        public void ecall_debug(void);
+#endif
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (preproc_ifdef
+      (identifier))
+    (include_declaration
+      (string_literal))
+    (preproc_else)
+    (include_declaration
+      (string_literal))
+    (preproc_endif)
+    (trusted_block
+      (preproc_ifdef
+        (identifier))
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list
+          (parameter
+            (primitive_type))))
+      (preproc_endif))))
+
+================================================================================
+Directives inside a declaration (Open Enclave)
+================================================================================
+
+enclave {
+    trusted {
+        public void f([in #ifdef X , count=n #endif] int* p
+#ifdef X
+                      , int n
+#endif
+                      );
+    };
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (trusted_block
+      (function_declaration
+        (primitive_type)
+        (identifier)
+        (parameter_list
+          (parameter
+            (attribute_list
+              (attribute
+                (identifier))
+              (preproc_ifdef
+                (identifier))
+              (attribute
+                (identifier)
+                (identifier))
+              (preproc_endif))
+            (primitive_type)
+            (pointer)
+            (identifier))
+          (preproc_ifdef
+            (identifier))
+          (parameter
+            (primitive_type)
+            (identifier))
+          (preproc_endif))))))
+
+================================================================================
+C preprocessor directives (Intel)
+================================================================================
+
+#define MAX_LEN 64
+#define FLAG
+#if defined(FOO) && BAR > 1
+#elif BAZ
+#endif
+#pragma once
+# include <stddef.h>
+enclave {
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc_def
+    (identifier)
+    (preproc_arg))
+  (preproc_def
+    (identifier))
+  (preproc_if
+    (preproc_arg))
+  (preproc_if
+    (preproc_arg))
+  (preproc_endif)
+  (preproc_call
+    (preproc_directive)
+    (preproc_arg))
+  (preproc_call
+    (preproc_directive)
+    (preproc_arg))
+  (enclave_definition))

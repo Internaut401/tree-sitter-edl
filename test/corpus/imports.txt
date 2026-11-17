@@ -1,0 +1,68 @@
+================================================================================
+Include declarations
+================================================================================
+
+enclave {
+    include "sgx_trts.h"
+    include "user_types.h";
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (include_declaration
+      (string_literal))
+    (include_declaration
+      (string_literal))))
+
+================================================================================
+Import everything from an EDL file
+================================================================================
+
+enclave {
+    from "sgx_tstdc.edl" import *;
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (import_declaration
+      (string_literal)
+      (wildcard))))
+
+================================================================================
+Import selected functions
+================================================================================
+
+enclave {
+    from "sgx_pthread.edl" import pthread_wait_timeout_ocall, pthread_create_ocall;
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (import_declaration
+      (string_literal)
+      (identifier)
+      (identifier))))
+
+================================================================================
+Plain import (Open Enclave)
+================================================================================
+
+enclave {
+    import "openenclave/edl/syscall.edl"
+    import "other.edl";
+};
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enclave_definition
+    (import_declaration
+      (string_literal))
+    (import_declaration
+      (string_literal))))

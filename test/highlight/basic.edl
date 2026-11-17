@@ -1,0 +1,55 @@
+enclave {
+// <- keyword
+    from "sgx_tstdc.edl" import *;
+//  ^ keyword
+//       ^ string.special
+//                       ^ keyword
+//                              ^ operator
+    include "user_types.h"
+//  ^ keyword
+//          ^ string.special
+#ifdef FEATURE
+// <- keyword
+//     ^ constant
+    struct buffer {
+//  ^ keyword
+//         ^ type
+        [size=len] uint8_t* data;
+//       ^ attribute
+//            ^ property
+//                 ^ type.builtin
+//                          ^ property
+    };
+#endif
+// <- keyword
+    enum color { RED = 1, GREEN };
+//  ^ keyword
+//       ^ type
+//               ^ constant
+//                     ^ number
+//                        ^ constant
+    trusted {
+//  ^ keyword
+        public int ecall_sum([in, count=len] const int* arr, size_t len);
+//      ^ keyword
+//             ^ type.builtin
+//                 ^ function
+//                            ^ attribute
+//                                      ^ variable.parameter
+//                                           ^ keyword
+//                                                    ^ operator
+//                                                      ^ variable.parameter
+//                                                           ^ type.builtin
+    };
+    untrusted {
+//  ^ keyword
+        void ocall_log([in, string] const char* msg) allow(ecall_sum) propagate_errno;
+//      ^ type.builtin
+//           ^ function
+//                          ^ attribute
+//                                              ^ variable.parameter
+//                                                   ^ keyword
+//                                                         ^ function
+//                                                                    ^ keyword
+    };
+};
