@@ -28,7 +28,33 @@ The only one with errors is an oeedger8r test file that is invalid on purpose.
 ## Neovim
 
 These steps use the `main` branch of [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter/tree/main),
-so you need what it needs: Neovim 0.12+, `tree-sitter-cli`, `curl`, `tar` and a C compiler.
+so you need what it needs: Neovim 0.12+, `curl`, `tar`, a C compiler and
+[`tree-sitter-cli`](https://github.com/tree-sitter/tree-sitter/blob/master/crates/cli/README.md) 0.26.1+. nvim-treesitter
+runs `tree-sitter build` to compile every parser, so the CLI is required even though this repo ships `src/parser.c`.
+Install it with your package manager, `cargo install --locked tree-sitter-cli`, or a binary from the
+[releases page](https://github.com/tree-sitter/tree-sitter/releases), not with npm. `:checkhealth nvim-treesitter`
+reports anything that is missing.
+
+**0. Make sure you are on nvim-treesitter's `main` branch.** The old `master` branch is frozen and has a different API.
+Plugin managers keep the branch they first cloned, and lazy.nvim also records it in `lazy-lock.json`, so a config
+that has used nvim-treesitter for a while is probably still on `master`, even though `main` is now the default. If
+you see `attempt to call field 'install' (a nil value)`, this is the cause. With lazy.nvim, set the branch explicitly:
+
+```lua
+{
+  "nvim-treesitter/nvim-treesitter",
+  branch = "main",
+  lazy = false,
+  build = ":TSUpdate",
+}
+```
+
+Then run `:Lazy sync`. For a clean switch, you can instead delete `~/.local/share/nvim/lazy/nvim-treesitter` and
+restart Neovim. This also removes the parsers that `master` compiled into that directory, which are git-ignored and
+would otherwise survive the switch. With Neovim's built-in `vim.pack`, use
+`{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" }`. Code written for `master`, such as
+`require("nvim-treesitter.configs").setup({ ... })`, does not work on `main` and must be rewritten. See
+nvim-treesitter's README.
 
 **1. Register the parser.** Add this to your Neovim config: `~/.config/nvim/init.lua`, or, if you use
 [lazy.nvim](https://github.com/folke/lazy.nvim), the `config` function of your nvim-treesitter plugin spec. It must
@@ -61,6 +87,10 @@ already starts treesitter in a `FileType` autocommand, you can skip this step:
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "edl",
   callback = function()
+    -- install() runs in the background, so the parser may not be there yet on first launch
+    if not vim.treesitter.language.add("edl") then
+      return
+    end
     vim.treesitter.start()
     vim.wo[0][0].foldmethod = "expr"
     vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
@@ -69,7 +99,60 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 ```
 
-Open an `.edl` file and run `:InspectTree` to see the syntax tree. `:TSUpdate` fetches the latest version.
+Open an `.edl` file and run `:InspectTree` to see the syntax tree. `:TSUpdate` fetches the latest version, or the
+`revision` you pinned.
+
+<details>
+<summary>All steps together, as a lazy.nvim plugin spec</summary>
+
+Save this as `~/.config/nvim/lua/plugins/treesitter.lua` if you use `require("lazy").setup("plugins")`. If you
+already have an nvim-treesitter spec, merge this into it rather than adding a second one: lazy.nvim runs only one
+`config` function per plugin.
+
+```lua
+return {
+  "nvim-treesitter/nvim-treesitter",
+  branch = "main",
+  lazy = false,
+  build = ":TSUpdate",
+  config = function()
+    -- 1. Register the parser
+    vim.filetype.add({ extension = { edl = "edl" } })
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "TSUpdate",
+      callback = function()
+        require("nvim-treesitter.parsers").edl = {
+          install_info = {
+            url = "https://github.com/internaut401/tree-sitter-edl",
+            queries = "queries/neovim",
+          },
+        }
+      end,
+    })
+
+    require("nvim-treesitter").setup()
+
+    -- 2. Install it, plus any other parsers you want
+    require("nvim-treesitter").install({ "edl" })
+
+    -- 3. Turn it on for EDL buffers
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "edl",
+      callback = function()
+        if not vim.treesitter.language.add("edl") then
+          return
+        end
+        vim.treesitter.start()
+        vim.wo[0][0].foldmethod = "expr"
+        vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+      end,
+    })
+  end,
+}
+```
+
+</details>
 
 ## Other editors
 
