@@ -28,12 +28,29 @@ The only one with errors is an oeedger8r test file that is invalid on purpose.
 ## Neovim
 
 These steps use the `main` branch of [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter/tree/main),
-so you need what it needs: Neovim 0.12+, `curl`, `tar`, a C compiler and
-[`tree-sitter-cli`](https://github.com/tree-sitter/tree-sitter/blob/master/crates/cli/README.md) 0.26.1+. nvim-treesitter
-runs `tree-sitter build` to compile every parser, so the CLI is required even though this repo ships `src/parser.c`.
-Install it with your package manager, `cargo install --locked tree-sitter-cli`, or a binary from the
-[releases page](https://github.com/tree-sitter/tree-sitter/releases), not with npm. `:checkhealth nvim-treesitter`
-reports anything that is missing.
+so you need what it needs:
+
+- Neovim 0.12+
+- `curl`, `tar` and a C compiler
+- [`tree-sitter-cli`](https://github.com/tree-sitter/tree-sitter/blob/master/crates/cli/README.md) 0.26.1+. This is
+  required for every user, not only for development. nvim-treesitter runs `tree-sitter build` to compile every
+  parser, even though this repo ships `src/parser.c`.
+
+Distribution packages are often too old for this (Ubuntu 26.04 ships 0.25.9), so check with `tree-sitter --version`.
+The simplest way to get a recent version is the prebuilt binary from the
+[releases page](https://github.com/tree-sitter/tree-sitter/releases). Replace `linux-x64` with `linux-arm64`,
+`macos-arm64`, ... to match your machine:
+
+```sh
+mkdir -p ~/.local/bin   # this directory must be on your PATH
+curl -fL https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz \
+  | gunzip > ~/.local/bin/tree-sitter
+chmod +x ~/.local/bin/tree-sitter
+tree-sitter --version
+```
+
+If you have Rust, `cargo install --locked tree-sitter-cli` works too. Do not install it with npm, as nvim-treesitter
+advises against it. `:checkhealth nvim-treesitter` reports anything that is missing.
 
 **0. Make sure you are on nvim-treesitter's `main` branch.** The old `master` branch is frozen and has a different API.
 Plugin managers keep the branch they first cloned, and lazy.nvim also records it in `lazy-lock.json`, so a config
