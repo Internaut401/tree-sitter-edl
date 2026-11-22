@@ -30,7 +30,9 @@ The only one with errors is an oeedger8r test file that is invalid on purpose.
 These steps use the `main` branch of [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter/tree/main),
 so you need what it needs: Neovim 0.12+, `tree-sitter-cli`, `curl`, `tar` and a C compiler.
 
-**1. Register the parser.** Add this to your config before `require("nvim-treesitter").setup()` is called:
+**1. Register the parser.** Add this to your Neovim config: `~/.config/nvim/init.lua`, or, if you use
+[lazy.nvim](https://github.com/folke/lazy.nvim), the `config` function of your nvim-treesitter plugin spec. It must
+run before `require("nvim-treesitter").setup()` is called:
 
 ```lua
 -- Neovim does not detect .edl files yet
@@ -93,7 +95,8 @@ tree-sitter test              # corpus tests (test/corpus) and highlight tests (
 tree-sitter parse file.edl    # print the syntax tree of a file
 ```
 
-To try local changes in Neovim, use `path` instead of `url` in `install_info`, and point it at your clone.
+To try local changes in Neovim, replace `url` with `path` in the `install_info` from step 1, and point it at your
+clone (for example `path = "~/git/tree-sitter-edl"`).
 nvim-treesitter then symlinks the queries, so query edits take effect when you reopen a buffer. After a grammar
 change, run `:TSInstall! edl`.
 
